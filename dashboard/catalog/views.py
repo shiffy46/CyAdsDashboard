@@ -70,6 +70,9 @@ class ByDateData(APIView):
 
         def get(self, request, format=None):
 
+            all_data = {}
+            myjsonlist = []
+
             dates = []
             views = []
 
@@ -83,6 +86,14 @@ class ByDateData(APIView):
 
             for date_data in PolitcalAdDataByDate.objects.all():
 
+                try:
+                    all_data[str(date_data.batch_startime)] += date_data.times_encountered
+                except:
+                    all_data[str(date_data.batch_startime)] = date_data.times_encountered
+
+
+            # for key, value in all_data.items():
+            #     myjsonlist.append([key, value])
 
                 #Initialize the lastDate
                 if numberOfVids is 0:
@@ -90,7 +101,7 @@ class ByDateData(APIView):
                     lastDate = date_data.batch_startime
 
                 #If the date has not changed
-                if str(lastDate) == str(date_data.batch_startime):
+                elif str(lastDate) == str(date_data.batch_startime):
                     tempUrlsGroup.append(date_data.url)
                     tempViewsGroup.append(date_data.times_encountered)
 
@@ -120,6 +131,7 @@ class ByDateData(APIView):
                 numberOfVids = numberOfVids + 1
 
             data = {
+                'all_data': all_data,
                 'dates': dates,
                 'views': views,
                 'urlsByDate': urlsByDate,
